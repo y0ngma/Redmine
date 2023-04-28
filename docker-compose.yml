@@ -1,0 +1,32 @@
+version: '3.1'
+
+services:
+
+  redmine_test1:
+    image: redmine:4.1-passenger
+    restart: always
+    container_name: redmine_test1_container
+    ports:
+      - 7270:3000
+    volumes:
+      - ./files:/usr/src/redmine/files
+      - ./themes:/usr/src/redmine/public/themes
+      - ./plugins:/usr/src/redmine/plugins
+    environment:
+      REDMINE_DB_POSTGRES: redmine_test1_db # 연결할 디비 서비스명 (variable 미지정시 SQlite)
+      REDMINE_DB_USERNAME: redmine
+      REDMINE_DB_DATABASE: redmine
+      REDMINE_DB_PASSWORD: passwd
+
+  redmine_test1_db:
+    image: postgres:12.2-alpine
+    container_name: redmine_test1_db
+    restart: always
+    ports: # 바인딩을 해두면 DBMS 사용가능
+      - 5444:5432
+    volumes:
+    - ./data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: redmine
+      POSTGRES_USER: redmine # (variable 미지정시 postgres)
+      POSTGRES_PASSWORD: passwd

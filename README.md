@@ -1,6 +1,6 @@
 # 레드마인 이용해보기
 ## Installation
-- 모든것은 우분투 환경 기준
+- 우분투 환경 기준
 1. with docker run command
     - https://www.2cpu.co.kr/QnA/782618
     - https://hiseon.me/server/redmine-install/
