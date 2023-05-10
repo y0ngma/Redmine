@@ -44,3 +44,23 @@
         user.save!
         exit
         ```
+
+## 백업
+- https://www.redmine.org/projects/redmine/wiki/RedmineBackupRestore
+### 백업 생성
+```sh
+# 마운트 경로 확인 후 접속
+docker inspect redmine_test1_db
+docker exec -it redmine_test1_db bash
+
+# /usr/bin/pg_dump -U <username> -h <hostname> -Fc --file=redmine.sqlc <redmine_database>
+# 저장경로를 마운트 되어 있는 폴더로 지정
+/usr/local/bin/pg_dump -U redmine -h redmine_test1_db -Fc --file=/var/lib/postgresql/data/redmine.sqlc redmine
+
+```
+### 백업 복원
+```sh
+cd /var/lib/postgresql/data/
+# --clean : 기존 삭제후 복원(덮어쓰기 되는듯?)
+pg_restore -U redmine -h redmine_test1_db -d redmine --clean redmine.sqlc
+```
