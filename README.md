@@ -18,10 +18,10 @@
 1. with docker-compose.yml
     - 도커 컴포즈 파일이 있는 경로에서 docker-compose up -d --build 명령어 실행
 
-## 레드마인 사용법
+# 레드마인 사용법
 - https://www.redmine.org/projects/redmine/wiki/KoGetting_Started
 
-### 초기비밀번호 변경
+## 초기비밀번호 변경
 - 최초 레드마인 가동 후 관리자 기본 admin/admin 로그인한뒤 비밀번호 변경화면이 `암호가 만료되었거나 관리자가 변경하도록 설정하였습니다` 문구와 함께 강제로 뜨는 현상
 - 거기서 비번을 올바르게 입력하여도 틀렸다고 나오는 이슈 발생시 해결방안
     - https://stackoverflow.com/questions/30655292/is-there-a-rake-command-to-reset-a-redmine-admin-password/30666786#30666786
@@ -60,13 +60,13 @@
     - https://www.redmineup.com/pages/help/helpdesk/how-to-set-up-outgoing-mail-settings-and-send-an-answer-to-a-customer-ticket
     - https://www.redmine.org/boards/2/topics/22259
 
-## 백업
+# 백업
 - 각종 설정을 마친 후 백업 및 복원까지 해보기
 - 참고 사이트
     - https://www.redmine.org/projects/redmine/wiki/RedmineBackupRestore
     - https://luckygg.tistory.com/357
 
-### 백업 생성
+## 백업 생성
 ```sh
 # 마운트 경로 확인 후 접속 docker inspect <컨테이너명>
 docker inspect -f '{{ json .Mounts }}' redmine_test1_db | python -m json.tool
@@ -77,7 +77,7 @@ docker exec -it redmine_test1_db bash
 /usr/local/bin/pg_dump -U redmine -h redmine_test1_db -Fc --file=/var/lib/postgresql/data/redmine.sqlc redmine
 ```
 
-### 백업 복원
+## 백업 복원
 ```sh
 # 백업파일이 있는곳으로 이동
 cd /var/lib/postgresql/data/
@@ -85,7 +85,7 @@ cd /var/lib/postgresql/data/
 pg_restore -U redmine -h redmine_test1_db -d redmine --clean redmine.sqlc
 ```
 
-### attachments 파일 백업
+## attachments 파일 백업
 - pg_store만 하면 프로젝트에 첨부파일은 복원 안되고 404뜬다
 - 따라서 /usr/src/redmine/files에 있던 내용을 백업해두었다가 붙여넣는다
 - 붙여넣는 즉시 404해결됨(컨테이너 재시작 또는 웹페이지 새로고침 필요없음)
@@ -96,3 +96,41 @@ rsync -r /home/gocp/redmine/test1-redmine/files /home/gocp/redmine/test1-redmine
 # 복원
 cp -r /home/gocp/redmine/test1-redmine/mybackup/files/* /home/gocp/redmine/test1-redmine/files
 ```
+
+# Slack Notifications Plugins
+    https://www.redmine.org/projects/redmine/wiki/Plugins
+    https://github.com/sciyoshi/redmine-slack
+## Installation of Redmine plugin 
+- docker 내에 plugin 폴더경로로 이동하여 설치한다
+```bash
+docker exec -it redmine_test1_container bash
+cd /usr/src/redmine/plugins
+git clone https://github.com/sciyoshi/redmine-slack.git redmine_slack
+bundle install
+exit
+docker-compose down -v; docker-compose up -d --build
+```
+
+## Installation of Slack Webhook App
+- 알림을 받을 채널에 webhook app 설치
+    1. 슬랙에서 webhook app 검색하여 설치한다
+    1. 알림을 받을 슬랙 채널명을 선택하여 webhook URL을 생성한다.
+
+## Configuration of Redmine general and project settings
+- 설정할 내용은 다음과 같습니다. 레드마인 UI에서 플러그인 설정을 먼저 마칩니다. 이후, 알림 종류(프로젝트 등)을 설정한 후 알림 대상별 설정텝에서 알림 보낼 슬랙의 채널명 등을 설정하면 됩니다.
+1. 레드마인 플러그인 설정
+    - 레드마인 상단 관리 - 플러그인 - 설치된 플러그인의 설정을 차례로 누른다.
+        - Slack URL칸에 슬랙에서 생성해 둔 webhook URL을 복사해 넣는다
+        - Slack Channel 칸에 알림 보낼 채널명을 입력한다
+        - 하단에 적용 클릭
+1. 알림 종류 설정
+    - 레드마인 상단 관리 - 사용자 정의 항목 - 새 사용자 정의 항목
+        - 프로젝트 등 설정할 알림의 종류 선택
+        - 이름 : 종류명 기입
+        - 형식 : 목록
+            - 가능한 값들 : #<슬랙채널명> 형식으로 기입
+        - 설정값 기입 후 만들기
+1. 알림 대상 설정
+    - 레드마인 상단 프로젝트 - 특정 프로젝트 - 상단에 설정탭
+        - 앞서 설정한 알림 종류에서 알림 보낼 채널명 선택
+        - 저장
