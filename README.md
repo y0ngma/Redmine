@@ -18,6 +18,8 @@
 1. with docker-compose.yml
     - 도커 컴포즈 파일이 있는 경로에서 docker-compose up -d --build 명령어 실행
 
+***
+
 # 레드마인 사용법
 - https://www.redmine.org/projects/redmine/wiki/KoGetting_Started
 
@@ -60,6 +62,8 @@
     - https://www.redmineup.com/pages/help/helpdesk/how-to-set-up-outgoing-mail-settings-and-send-an-answer-to-a-customer-ticket
     - https://www.redmine.org/boards/2/topics/22259
 
+***
+
 # 백업
 - 각종 설정을 마친 후 백업 및 복원까지 해보기
 - 참고 사이트
@@ -96,7 +100,7 @@ rsync -r /home/gocp/redmine/test1-redmine/files /home/gocp/redmine/test1-redmine
 # 복원
 cp -r /home/gocp/redmine/test1-redmine/mybackup/files/* /home/gocp/redmine/test1-redmine/files
 ```
-
+***
 # Slack Notifications Plugins
     https://www.redmine.org/projects/redmine/wiki/Plugins
     https://github.com/sciyoshi/redmine-slack
@@ -134,3 +138,31 @@ docker-compose down -v; docker-compose up -d --build
     - 레드마인 상단 프로젝트 - 특정 프로젝트 - 상단에 설정탭
         - 앞서 설정한 알림 종류에서 알림 보낼 채널명 선택
         - 저장
+
+* * *
+
+# Theme
+    https://github.com/mrliptontea/PurpleMine2
+
+## Theme main features
+- 가독성이 좋은 폰트, 깃허브와 유사한 wiki
+- list, issue page 및 wiki 에서 tracker 링크를 색깔로 구분
+- Jira에서 영감을 받은 우선순위 아이콘 채택
+- 좌측으로 옮겨진 사이드바의 투명도 토글화
+- variable로 관리하는 보다 편리한 커스터마이징
+
+## Installation of theme
+도커내에 압축을 해제
+```bash
+docker exec -it redmine_test1_container bash
+# 레드마인설치경로 = "/usr/src/redmine"
+cd /usr/src/redmine/public/themes
+wget https://github.com/mrliptontea/PurpleMine2/archive/master.zip
+unzip master.zip
+```
+
+## Configuration for Redmine theme
+1. 레드마인 테마 설정
+    - 상단에 관리 - 설정 클릭후 - 표시방식 텝 내에서 설정한다
+        - 테마(드롭다운) - 설치한 테마 선택 - 저장
+***
