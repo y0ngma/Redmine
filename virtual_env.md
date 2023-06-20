@@ -34,7 +34,10 @@ wsl --list --verbose
 # 여러 배포판 설치시 기본 배포판 설정 방법
 wsl --set-default ubuntu-22.04
 
+# wsl 기본 버전을 wsl2로 고정
 wsl --update
+wsl --status
+wsl --set-default-version 2
 wsl --status
 
 # 전체 종료
@@ -82,3 +85,21 @@ vagrant box add generic/ubuntu2204/docker ./package.box
 ### Vagrantfile
 - 명령어 실행순서는 위에서 아래로 진행하되 블럭안에 블럭이 있으면 바깥->안으로 진행
 - 이에 따라 글로벌 설정을 바깥블럭에, 특정설정은 안에 배치하여 덮어쓰기 가능
+
+- Virtualbox용 guest addition설치
+```bash
+wget http://download.virtualbox.org/virtualbox/7.0.8/VBoxGuestAdditions_7.0.8.iso
+sudo mkdir /media/VBoxGuestAdditions
+sudo mount -o loop,ro VBoxGuestAdditions_7.0.8.iso /media/VBoxGuestAdditions
+sudo apt-get -y install bzip2
+sudo sh /media/VBoxGuestAdditions/VBoxLinuxAdditions.run uninstall --force
+sudo sh /media/VBoxGuestAdditions/VBoxLinuxAdditions.run
+rm VBoxGuestAdditions_7.0.8.iso
+sudo umount /media/VBoxGuestAdditions
+sudo rmdir /media/VBoxGuestAdditions
+```
+- 
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+docker run hello-world
