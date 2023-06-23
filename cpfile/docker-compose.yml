@@ -1,0 +1,36 @@
+version: '3.1'
+
+services:
+  postgres:
+    build:
+      context: ./
+      dockerfile: Dockerfile-postgres
+    image: redmine-postgres.kr:15.3
+    container_name: redmine-postgres
+    restart: always
+    ports:
+      - 13001:5432
+    volumes:
+    - /sync/postgresql/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: redminedb
+      POSTGRES_USER: redmine
+      POSTGRES_PASSWORD: 12345.redmine.54321
+
+  redmine:
+    image: redmine:5.0.5
+    restart: always
+    container_name: redmine5
+    ports:
+      - 13000:3000
+    volumes:
+      - /sync/redmine/files:/usr/src/redmine/files
+      - /sync/redmine/public/themes:/usr/src/redmine/public/themes
+      - /sync/redmine/plugins:/usr/src/redmine/plugins
+      - /sync/redmine/config/configuration.yml:/usr/src/redmine/config/configuration.yml
+    environment:
+      # 연결할 디비 서비스명 (variable 미지정시 SQlite)
+      REDMINE_DB_POSTGRES: redmine-postgres
+      REDMINE_DB_DATABASE: redminedb
+      REDMINE_DB_USERNAME: redmine
+      REDMINE_DB_PASSWORD: 12345.redmine.54321
