@@ -61,7 +61,7 @@ https://cafe-jun12.tistory.com/33#Vagrant%20%EB%A5%BC%20%EC%9D%B4%EC%9A%A9%ED%95
 ### commands
 https://cafe-jun12.tistory.com/34?category=858437
 ```bash
-vagrant init bento/ubuntu-22.04
+# Vagrant 및 Virtualbox 프로그램 설치 후 Vagrantfile 이 있는 경로에서
 vagrant up
 # provider 실행 및 정보 확인
 vagrant status
@@ -82,24 +82,84 @@ vagrant package
 vagrant box add generic/ubuntu2204/docker ./package.box
 ```
 
-### Vagrantfile
+***
+
+## Vagrantfile
 - 명령어 실행순서는 위에서 아래로 진행하되 블럭안에 블럭이 있으면 바깥->안으로 진행
 - 이에 따라 글로벌 설정을 바깥블럭에, 특정설정은 안에 배치하여 덮어쓰기 가능
 
-- Virtualbox용 guest addition설치
-```bash
-wget http://download.virtualbox.org/virtualbox/7.0.8/VBoxGuestAdditions_7.0.8.iso
-sudo mkdir /media/VBoxGuestAdditions
-sudo mount -o loop,ro VBoxGuestAdditions_7.0.8.iso /media/VBoxGuestAdditions
-sudo apt-get -y install bzip2
-sudo sh /media/VBoxGuestAdditions/VBoxLinuxAdditions.run uninstall --force
-sudo sh /media/VBoxGuestAdditions/VBoxLinuxAdditions.run
-rm VBoxGuestAdditions_7.0.8.iso
-sudo umount /media/VBoxGuestAdditions
-sudo rmdir /media/VBoxGuestAdditions
-```
-- 
-sudo groupadd docker
-sudo usermod -aG docker $USER
-newgrp docker
-docker run hello-world
+#### Virtualbox용 guest addition설치
+- 수동설치시 되나 vagrantfile로 설치시 안되어 보류
+    ```bash
+    wget http://download.virtualbox.org/virtualbox/7.0.8/VBoxGuestAdditions_7.0.8.iso
+    sudo mkdir /media/VBoxGuestAdditions
+    sudo mount -o loop,ro VBoxGuestAdditions_7.0.8.iso /media/VBoxGuestAdditions
+    sudo apt-get -y install bzip2
+    sudo sh /media/VBoxGuestAdditions/VBoxLinuxAdditions.run uninstall --force
+    sudo sh /media/VBoxGuestAdditions/VBoxLinuxAdditions.run
+    rm VBoxGuestAdditions_7.0.8.iso
+    sudo umount /media/VBoxGuestAdditions
+    sudo rmdir /media/VBoxGuestAdditions
+    ```
+
+### 도커 설치 
+- https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
+1. 공식문서대로 순차적으로 진행
+    ```bash
+    sudo apt-get update
+    sudo apt-get install -y ca-certificates curl gnupg
+
+    # Add Docker's official GPG key:
+    sudo install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+    # Use following command to set up the repository
+    echo \
+    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    ```
+
+1. sudo apt-get update 자동으로 안되는 이슈때문에 다음을 추가함
+    - https://oracle-base.com/blog/2022/09/18/vagrant-ssh-auth-method-private-key-timed-out/
+    - https://rainbound.tistory.com/entry/Vagrant-ssh-stuckwindows
+    ```bash
+    # sudo apt-get update한 뒤에도 컨테이너 내에서 또 해야하는 문제해결
+    sudo apt update
+    ```
+
+1. 특정버전으로 설치시 가용버전확인 후 Install Docker Engine, containerd, and Docker Compose
+    ```bash
+    apt-cache madison docker-ce | awk '{ print $3 }'
+    VERSION_STRING=5:24.0.2-1~ubuntu.22.04~jammy
+    sudo apt-get install -y docker-ce=$VERSION_STRING docker-ce-cli=$VERSION_STRING containerd.io docker-buildx-plugin docker-compose-plugin
+    ```
+    - 다만 버전 지정하여 설치시 docker-ce/docker-ce-cli 관련 에러발생. 
+        ```bash
+        # 다음과 같이 버전 부분 지우고 다음 내용으로 대체후 진행
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        ```
+
+1. docker 명령어 sudo로 실행전 권한부여필수
+    - https://github.com/occidere/TIL/issues/116
+        ```bash
+        sudo chown vagrant:vagrant /var/run/docker.sock
+
+        # sudo 없이 작동 테스트
+        docker run hello-world
+        ```
+    - docker 명령어 sudo 없이 진행하려 시도한 방법들(재부팅 없이 가능한 방법 못찾음)
+        ```bash
+        # sudo groupadd docker
+        # sudo usermod -aG docker $USER
+        # newgrp docker
+        # sudo /usr/sbin/groupadd -f docker
+        # sudo /usr/sbin/usermod -aG docker $USER
+
+        # 아래는 보안성 문제때문에 제외
+        sudo chmod 666 /var/run/docker.sock
+        # 컨테이너접속해서 확인시에는 $USER가 vagrant였으나 설치중에는 root였음
+        sudo chown $USER:$USER /var/run/docker.sock
+        # 따라서 vagrant:vagrant으로 명시함으로 해결.
+        ```
