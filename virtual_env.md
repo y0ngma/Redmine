@@ -163,3 +163,10 @@ vagrant box add generic/ubuntu2204/docker ./package.box
         sudo chown $USER:$USER /var/run/docker.sock
         # 따라서 vagrant:vagrant으로 명시함으로 해결.
         ```
+
+1. 설치후 확인 사항
+https://stackoverflow.com/questions/22922891/vagrant-ssh-authentication-failure
+
+```bash
+vagrant ssh-config
+```

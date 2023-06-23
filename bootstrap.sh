@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 sudo apt-get update
+sudo apt install net-tools
 sudo apt-get install -y ca-certificates curl gnupg
 
 # Add Docker's official GPG key:
@@ -16,7 +17,7 @@ echo \
 sudo apt update
 
 # 최신버전 설치하기
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose
 
 # docker 명령어 sudo로 실행전 권한부여필수
 sudo chown vagrant:vagrant /var/run/docker.sock
