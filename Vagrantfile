@@ -1,6 +1,7 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/ubuntu2204"
   config.vm.box_version = "4.2.16"
+  ENV['LC_ALL']="ko_KR.UTF-8"
   config.vm.provider "virtualbox" do |machine|
     machine.memory=4096
     machine.cpus=4
@@ -11,7 +12,7 @@ Vagrant.configure("2") do |config|
     # 호스트리소스 최대사용 허용치 설정(단위%)
     machine.customize ["modifyvm", :id, "--vram", "128", "--cpuexecutioncap", "50"]
   end
-  config.vm.synced_folder "../VAGRANT_SYNC", "/sync"
+  config.vm.synced_folder "../VAGRANT_SYNC", "/sync", owner: "vagrant", group: "vagrant", disabled: false
   # config.vm.network "forwarded_port", guest: 13000, host: 7270, host_ip: "127.0.0.1"
   config.vm.network "forwarded_port", guest: 13000, host: 7270
   # # 호스트에서만 접근 가능한 아이피 값을 추가적으로 지정하기
@@ -29,15 +30,14 @@ Vagrant.configure("2") do |config|
   # init_overwrite.sh 실행후
   config.vm.provision "shell", inline: "sudo mkdir -p /sync/redmine/config"
   config.vm.provision "shell", inline: "sudo cp /sync/configuration.yml /sync/redmine/config/"
+  
+  # # 내부에서 실행하기
+  # config.vm.provision "shell", inline: "sudo echo cd /sync"
+  # config.vm.provision "shell", inline: "sudo echo $(ls)"
+  # config.vm.provision "shell", inline: "docker-compose up -d --build"
+  
   # # init_overwrite.sh 실행 없이
-  # config.vm.synced_folder "./cpfile/configuration.yml", "/sync/redmine/config/configuration.yml"
+  # config.vm.synced_folder "cpfile/configuration.yml", "/sync/redmine/config/configuration.yml"
   # config.vm.synced_folder "./cpfile/Dockerfile-postgres", "/sync"
   # config.vm.synced_folder "./cpfile/docker-compose.yml", "/sync"
-
-  # 내부에서 실행하기
-  config.vm.provision "shell", inline: "sudo echo cd /sync"
-  config.vm.provision "shell", inline: "sudo echo $(ls)"
-  # config.vm.provision "shell", inline: "sudo cp /sync/docker-compose.yml /sync"
-  # config.vm.provision "shell", inline: "sudo cp /sync/Dockerfile-postgres /sync"
-  config.vm.provision "shell", inline: "docker-compose up -d --build"
 end

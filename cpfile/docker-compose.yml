@@ -11,7 +11,7 @@ services:
     ports:
       - 13001:5432
     volumes:
-    - /sync/postgresql/data:/var/lib/postgresql/data
+    - ./postgresql/data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: redminedb
       POSTGRES_USER: redmine
@@ -24,10 +24,10 @@ services:
     ports:
       - 13000:3000
     volumes:
-      - /sync/redmine/files:/usr/src/redmine/files
-      - /sync/redmine/public/themes:/usr/src/redmine/public/themes
-      - /sync/redmine/plugins:/usr/src/redmine/plugins
-      - /sync/redmine/config/configuration.yml:/usr/src/redmine/config/configuration.yml
+      - ./redmine/files:/usr/src/redmine/files
+      - ./redmine/public/themes:/usr/src/redmine/public/themes
+      - ./redmine/plugins:/usr/src/redmine/plugins
+      - ./redmine/config/configuration.yml:/usr/src/redmine/config/configuration.yml
     environment:
       # 연결할 디비 서비스명 (variable 미지정시 SQlite)
       REDMINE_DB_POSTGRES: redmine-postgres
