@@ -88,7 +88,22 @@ vagrant box add generic/ubuntu2204/docker ./package.box
 - 명령어 실행순서는 위에서 아래로 진행하되 블럭안에 블럭이 있으면 바깥->안으로 진행
 - 이에 따라 글로벌 설정을 바깥블럭에, 특정설정은 안에 배치하여 덮어쓰기 가능
 
-#### Virtualbox용 guest addition설치
+## provider as docker
+- 도커 프로바이더로 진행 에러로 인해 보류. virtualbox로 진행
+```bash
+Vagrant.configure("2") do |config|
+  config.vm.hostname = "ubuntu"
+  config.vm.provider "docker" do |dc|
+    # dc.build_dir="."
+    dc.image = "ubuntu"
+    # dc.compose=true
+    dc.remains_running = true
+    dc.has_ssh = true
+  end
+end
+```
+## provider as virtualbox
+### Virtualbox용 guest addition설치
 - 수동설치시 되나 vagrantfile로 설치시 안되어 보류
     ```bash
     wget http://download.virtualbox.org/virtualbox/7.0.8/VBoxGuestAdditions_7.0.8.iso
@@ -164,9 +179,68 @@ vagrant box add generic/ubuntu2204/docker ./package.box
         # 따라서 vagrant:vagrant으로 명시함으로 해결.
         ```
 
-1. 설치후 확인 사항
-https://stackoverflow.com/questions/22922891/vagrant-ssh-authentication-failure
+***
 
+## 설치 후 서비스 실행 해보기
+- 설치후 확인 사항
+https://stackoverflow.com/questions/22922891/vagrant-ssh-authentication-failure
 ```bash
 vagrant ssh-config
+```
+- 도커 실행 명령어
+```bash
+config.vm.provision "shell", inline: "docker build -t username/image /vagrant; docker run -d username/image"
+```
+
+### error : 서버는 지정한 데이터 디렉터리의 소유주 권한으로 시작되어야 합니다.
+- 내용
+```bash
+# 한글 로케일로 LANG 설정시 디버깅 시 에러검색하기에 불리
+vagrant@ubuntu2204:/sync$ docker logs 1d03b8a95b2a
+이 데이터베이스 시스템에서 만들어지는 파일들은 그 소유주가 "postgres" id로
+지정될 것입니다. 또한 이 사용자는 서버 프로세스의 소유주가 됩니다.
+
+데이터베이스 클러스터는 "ko_KR.utf8" 로케일으로 초기화될 것입니다.
+기본 데이터베이스 인코딩은 "UTF8" 인코딩으로 설정되었습니다.
+기본 텍스트 검색 구성이 "simple"(으)로 설정됩니다.
+
+자료 페이지 체크섬 기능 사용 하지 않음
+initdb: "ko_KR.utf8" 로케일에 알맞은 전문검색 설정을 찾을 수 없음
+
+이미 있는 /var/lib/postgresql/data 디렉터리의 액세스 권한을 고치는 중 ...완료
+하위 디렉터리 만드는 중 ...완료
+사용할 동적 공유 메모리 관리방식을 선택하는 중 ... posix
+max_connections 초기값을 선택하는 중 ...20
+기본 shared_buffers를 선택하는 중... 400kB
+기본 지역 시간대를 선택 중 ... Etc/UTC
+환경설정 파일을 만드는 중 ...완료
+2023-06-23 07:42:07.646 UTC [84] 치명적오류:  "/var/lib/postgresql/data" 데이터 디렉터리 소유주가 잘못 되었습니다.
+2023-06-23 07:42:07.646 UTC [84] 힌트:  서버는 지정한 데이터 디렉터리의 소유주 권한으로 시작되어야 합니다.
+하위 프로세스가 종료되었음, 종료 코드 1
+initdb: "/var/lib/postgresql/data" 데이터 디렉터리 안의 내용을 지우는 중
+부트스트랩 스크립트 실행 중 ... 
+```
+#### sudo usermod -a -G docker vagrant 해서 다음과 같이 서브그룹에 추가한다
+```bash
+# id입력시 다음과 같이 999(docker)나오도록
+uid=1000(vagrant) gid=1000(vagrant) groups=1000(vagrant),999(docker)
+```
+
+#### vi시 폰트깨짐 문제 : 가상머신 내 설정된 로케일 영어 -> 한글 변경
+```bash
+# 사용가능한 로케일 목록에 한글 있는지 확인
+locale -a
+# 없을 시 locales 패키지 설치 후 생성가능한 로케일 확인
+sudo apt-get update
+audo apt-get install locales
+cat /usr/share/i18n/SUPPORTED # 목록에 ... ko_KR.UTF-8 UTF-8 ...확인
+# 로케일 생성 후 추가확인
+localedef -f UTF-8 -i ko_KR ko_KR.UTF-8
+locale -a
+# 환경변수 정의
+export LC_ALL=ko_KR.UTF-8
+# 현재 설정된 로케일 확인
+locale
+# 깨지지 않는지 확인
+cat /usr/sbin/usermod
 ```
