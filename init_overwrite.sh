@@ -4,7 +4,8 @@ if [ -d $VARGRANT_SYNC_FOLDER ]; then
 else
   echo "Creating my vagrant sync folder: $VARGRANT_SYNC_FOLDER"
   mkdir -p $VARGRANT_SYNC_FOLDER
-  cp ./cpfile/Dockerfile-postgres $VARGRANT_SYNC_FOLDER
-  cp ./cpfile/configuration.yml $VARGRANT_SYNC_FOLDER
-  cp ./cpfile/docker-compose.yml $VARGRANT_SYNC_FOLDER
+  mkdir -p $VARGRANT_SYNC_FOLDER/redmine/config
+cp ./cpfile/Dockerfile-postgres $VARGRANT_SYNC_FOLDER
+cp ./cpfile/docker-compose.yml $VARGRANT_SYNC_FOLDER
+cp ./cpfile/configuration.yml $VARGRANT_SYNC_FOLDER/redmine/config
 fi
