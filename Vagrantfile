@@ -15,8 +15,8 @@ Vagrant.configure("2") do |config|
   config.vm.post_up_message
   config.vm.synced_folder "../VAGRANT_SYNC", "/sync"#, owner: "root", group: "root"
   config.vm.network "forwarded_port", guest: 13000, host: 13000
-  # # 호스트에서만 접근 가능한 아이피 값을 추가적으로 지정하기
-  # config.vm.network "private_network", ip: "192.168.33.10"
+  # 호스트에서만 접근 가능한 아이피 값을 추가적으로 지정하기
+  config.vm.network "private_network", ip: "192.168.33.10"
   # # 브릿지를 통해 마치 내부 망의 물리머신에 있는 머신처럼 사용가능
   # config.vm.network "public_network", :bridge => 'en0'
   
@@ -35,5 +35,5 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: "sudo echo $(id)"
   config.vm.provision "shell", inline: "sudo echo $(pwd)"
   config.vm.provision "shell", inline: "docker compose -f /app/docker-compose.yml up -d --build"
-  config.vm.provision "shell", inline: "sudo echo $(docker ps)"
+  # config.vm.provision "shell", inline: "sudo echo $(docker ps)"
 end

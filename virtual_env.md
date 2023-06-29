@@ -227,6 +227,7 @@ uid=1000(vagrant) gid=1000(vagrant) groups=1000(vagrant),999(docker)
 ```
 
 #### vi시 폰트깨짐 문제 : 가상머신 내 설정된 로케일 영어 -> 한글 변경
+- sudo /usr/sbin/usermod -aG docker vagrant가 잘 먹히지 않아 직접 vi로 수정중 깨짐 증상 확인 
 ```bash
 # 사용가능한 로케일 목록에 한글 있는지 확인
 locale -a
@@ -244,3 +245,14 @@ locale
 # 깨지지 않는지 확인
 cat /usr/sbin/usermod
 ```
+
+#### 해결 : sync폴더 밖에서 postgres 실행
+- 마운트 된 파일들을 VM 안에서 직접 root계정상태에서 타경로로 복사하여 docker-compose up하여 해결
+    - 도커서브그룹 포함여부(usermod -aG docker vagrant또는root)와 무관. 로케일과 무관
+- ~~따라서 애초에 마운트 디렉토리시 소유권을 root로 변경 필요~~
+
+
+# 할일
+1. 로케일 설정
+1. docker 사용자 계정 root vs rootless 결정
+
