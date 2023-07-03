@@ -1,6 +1,6 @@
 # 레드마인 이용해보기
 ## Installation
-- 우분투 환경 기준
+### 우분투 환경 기준
 1. with docker run command
     - https://www.2cpu.co.kr/QnA/782618
     - https://hiseon.me/server/redmine-install/
@@ -17,6 +17,43 @@
 
 1. with docker-compose.yml
     - 도커 컴포즈 파일이 있는 경로에서 docker-compose up -d --build 명령어 실행
+
+### 윈도우 환경 기준
+1. 가상머신 프로그램 설치
+    - Vagrant 홈페이지에서 호환가능한 Virtualbox버전을 참고하여 다운로드 받도록 한다.
+    - 참고 사이트
+        - https://developer.hashicorp.com/vagrant/docs/installation
+        - https://www.virtualbox.org/wiki/Downloads
+    - 설명에 기준이 된 버전은 다음과 같다
+        - Vagrant 2.3.6
+        - Virtualbox 6.1
+1. 가상머신 파일 구동
+    - 설치 완료후에 Vagrantfile이 있는 ~/Redmine 리포지토리 경로로 이동하여 다음을 입력한다
+        ```bash
+        cd Redmine
+
+        # cpfile에 있는 파일을 리포지토리 외부의 마운트 경로로 복사
+        init_overwirte.sh
+        
+        # 가상머신 구동 및 각종 설치
+        vagrant up
+        ```
+1. 가상머신 접속 
+    - 가상머신 구동시 docker-compose.yml을 자동실행하도록 되어있다. 
+    - 접속 이후 docker 또는 Redmine 관련 명령어를 입력하여 필요한 설정을 마무리 한다.
+        ```bash
+        # 가상머신 접속
+        vagrant ssh
+        # 가상머신 나오기 exit
+        # 가상머신 끄기 vagrant halt
+        # 가상머신 삭제 vagrant destroy
+        
+        # 레드마인 컨테이너 구동 확인
+        docker ps
+
+        # 웹브라우져 레드마인 접속
+        http://127.0.0.1:13000/
+        ```
 
 ***
 
