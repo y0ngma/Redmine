@@ -25,12 +25,7 @@ sudo apt update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose
 
 # docker 명령어 sudo로 실행전 권한부여필수
-# sudo chown vagrant:vagrant /var/run/docker.sock
-sudo chown vagrant:vagrant /var/lib/postgresql/data
-
-sudo /usr/sbin/groupadd -f docker
-sudo /usr/sbin/usermod -aG docker vagrant
-newgrp docker
+sudo chown vagrant:vagrant /var/run/docker.sock
 
 # # sudo 없이 작동 테스트 (터미널 재시작 하지 않고 되어야 함)
 # docker run hello-world

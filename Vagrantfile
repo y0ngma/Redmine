@@ -1,7 +1,6 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/ubuntu2204"
   config.vm.box_version = "4.2.16"
-  ENV['LC_ALL']="ko_KR.UTF-8"
   config.vm.provider "virtualbox" do |machine|
     machine.memory=4096
     machine.cpus=4
