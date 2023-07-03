@@ -1,0 +1,49 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+unless Vagrant.has_plugin?("vagrant-docker-compose")
+  system("vagrant plugin install vagrant-docker-compose")
+  puts "Dependencies installed, please try the command again."
+  exit
+end
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/ubuntu2204"
+  config.vm.box_version = "4.2.16"
+  config.vm.provider "virtualbox" do |machine|
+    machine.memory=4096
+    machine.cpus=4
+    machine.name="ubuntu_2204_redmine"
+    machine.customize ["modifyvm", :id, "--vram", "128", "--cpuexecutioncap", "50"]
+  end
+  config.vm.post_up_message
+  config.vm.synced_folder "../VAGRANT_SYNC", "/sync"#, owner: "root", group: "root"
+  config.vm.network "forwarded_port", guest: 13000, host: 13000
+  # docker 설치
+  config.vm.provision :shell, inline: "apt-get update"
+  config.vm.provision :docker
+  config.trigger.after [:provision] do |t|
+    t.name = "Reboot after provisioning"
+    t.run = { :inline => "vagrant reload" }
+  end
+  port = 9090
+  config.vm.provision :docker_compose,
+    env: { "PORT" => "#{port}" },
+    yml: [ "/sync/docker-compose.yml", ],
+    rebuild: true,
+    project_name: "myproject",
+    run: "always"
+end
+# 에러내용
+# C:\home\Redmine>vagrant status
+# Installing the 'vagrant-docker-compose' plugin. This can take a few minutes...
+# ERROR:  SSL verification error at depth 3: unable to get local issuer certificate (20)
+# ERROR:  You must add /C=US/O=Starfield Technologies, Inc./OU=Starfield Class 2 Certification Authority to your local trusted store
+# Vagrant failed to load a configured plugin source. This can be caused
+# by a variety of issues including: transient connectivity issues, proxy
+# filtering rejecting access to a configured plugin source, or a configured
+# plugin source not responding correctly. Please review the error message
+# below to help resolve the issue:
+
+#   SSL_connect SYSCALL returned=5 errno=0 peeraddr=13.225.131.22:443 state=error: certificate verify failed (https://gems.hashicorp.com/specs.4.8.gz)
+
+# Source: https://gems.hashicorp.com/
+# Dependencies installed, please try the command again.
