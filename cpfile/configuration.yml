@@ -12,15 +12,13 @@ default:
   email_delivery:
     delivery_method: :smtp
     smtp_settings:
-      # enable_starttls_auto: true
-      address: "wsmtp.ecounterp.com"
-      port: 587
-      domain: "wsmtp.ecounterp.com"
-      # authentication: :plain
-      # authentication: :login
-      # ssl: true
-      user_name: "test@gnewsoft.com"
-      password: "password"
+      enable_starttls_auto: true
+      address: "smtp.gmail.com" # 회사 smtp 주소를 입력합니다.
+      port: 587 # 회사에서 smtp를 위한 Port를 입력합니다.
+      domain: "smtp.gmail.com" # 회사의 도메인을 입력합니다.
+      authentication: :plain
+      user_name: "your_email@gmail.com" # G메일 아이디 혹은 회사 아이디
+      password: "your_password" # G메일 패스워드 혹은 회사 패스워드
 
   # ==== Simple SMTP server at localhost
   #
