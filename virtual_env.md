@@ -167,13 +167,16 @@ end
     - docker 명령어 sudo 없이 진행하려 시도한 방법들(재부팅 없이 가능한 방법 못찾음)
         ```bash
         # sudo groupadd docker
-        # sudo usermod -aG docker $USER
         # newgrp docker
         # sudo /usr/sbin/groupadd -f docker
-        # sudo /usr/sbin/usermod -aG docker $USER
+        # sudo /usr/sbin/usermod -aG docker vagrant
+
+        # id입력시 다음과 같이 서브그룹에 추가되어 999(docker)나오는지 확인
+        # uid=1000(vagrant) gid=1000(vagrant) groups=1000(vagrant),999(docker)
 
         # 아래는 보안성 문제때문에 제외
         sudo chmod 666 /var/run/docker.sock
+
         # 컨테이너접속해서 확인시에는 $USER가 vagrant였으나 설치중에는 root였음
         sudo chown $USER:$USER /var/run/docker.sock
         # 따라서 vagrant:vagrant으로 명시함으로 해결.
@@ -220,10 +223,10 @@ max_connections 초기값을 선택하는 중 ...20
 initdb: "/var/lib/postgresql/data" 데이터 디렉터리 안의 내용을 지우는 중
 부트스트랩 스크립트 실행 중 ... 
 ```
-#### sudo usermod -a -G docker vagrant 해서 다음과 같이 서브그룹에 추가한다
+
+#### 권한이 없다고 하는 폴더 권한 변경하기
 ```bash
-# id입력시 다음과 같이 999(docker)나오도록
-uid=1000(vagrant) gid=1000(vagrant) groups=1000(vagrant),999(docker)
+sudo chown vagrant:vagrant /var/lib/postgresql/data
 ```
 
 #### vi시 폰트깨짐 문제 : 가상머신 내 설정된 로케일 영어 -> 한글 변경
@@ -252,7 +255,6 @@ cat /usr/sbin/usermod
 - ~~따라서 애초에 마운트 디렉토리시 소유권을 root로 변경 필요~~
 
 
-# 할일
-1. 로케일 설정
-1. docker 사용자 계정 root vs rootless 결정
+### 할일
+1. 로케일 설정 vagrant up 할때 적용 및 유지되도록 하기
 
