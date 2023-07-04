@@ -9,6 +9,8 @@
 
 # default configuration options for all environments
 default:
+  # 다음의 알림메일 설정을 마친 후에 init_overwrite.sh 실행 후 다음을 실행
+  # docker-compose down -v; docker-compose up -d --build
   email_delivery:
     delivery_method: :smtp
     smtp_settings:
