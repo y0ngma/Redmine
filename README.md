@@ -16,6 +16,13 @@
         - 이후 http://192.168.0.232:7270/ 접속확인
 
 1. with docker-compose.yml
+    - 사용자가 docker 그룹이 아닌 경우 그룹에 포함시킴 
+        ```bash
+        sudo usermod -a -G docker $USER
+        # 명령 수행후 적용되기 위해 시스템 재부팅 필요함
+        id # 현재 사용자 ID, 그룹 확인
+        ```
+
     - 도커 컴포즈 파일이 있는 경로에서 docker-compose up -d --build 명령어 실행
 
 ### 윈도우 환경 기준
@@ -86,8 +93,17 @@
 
 ## 이메일 알림 설정
 - 성공적으로 설정이 되면 관리자 권한이 있는 계정으로 로그인 후 상단에 관리-설정-메일알림에서 알림메일이 필요한 작업을 선택가능합니다.
-- 
 - configuration.yml
+    ```yml
+    email_delivery:
+        delivery_method: :smtp
+        smtp_settings:
+        address: "<SMTP SERVER ADDR>"
+        port: 587
+        domain: "<SMTP SERVER ADDR>"
+        user_name: "test@gmail.com"
+        password: "password"
+    ```
     - smtp_settings 의 user_name 이메일 주소와 레드마인 페이지 상단에 관리-설정-메일알림의 발신주소가 동일해야함
     - 해당 메일주소로 발신자가 설정이 됨
     - 폴더 마운트시 호스트 -> 컨테이너로 덮어쓰기 되어 버린다.
@@ -99,6 +115,28 @@
     - https://www.redmineup.com/pages/help/helpdesk/how-to-set-up-outgoing-mail-settings-and-send-an-answer-to-a-customer-ticket
     - https://www.redmine.org/boards/2/topics/22259
 
+## Redmine 웹 페이지 접속
+접속 주소: `<ip>:13000`
+  - `로그인` 누르고 관리자로 접속
+  - 초기 패스워드 admin / admin임
+
+- 초기 Redmine 설정
+  - 좌측상단 `관리`
+    - 한글을 기본 언어로 설정: 관리자/설정/표시방법 페이지에서 "기본언어" 한글로 설정
+    - 좌측메뉴 `설정`
+      1. `일반`탭
+        1. 레드마인 제목 설정: 관리자/설정/일반 페이지에서 "레드마인 제목" "GNEW Lab 프로젝트관리" 설정
+        1. 서버 URL 설정: 관리자/설정/일반 페이지에서 "호스트 이름과 경로" "gnew-office.tplinkdns.com:13000" 설정
+
+      1. `표시방식`탭
+        1. 사용자 표시 형식 성 이름 순서로 표시되게 함: 관리자/설정/표시방법 페이지에서 "사용자 표시 형식" 변경
+
+      1. `인증`탭
+        1. 로그인하지 않은 사용자 프로젝트 볼수 없게함: 관리자/설정/인증 페이지에서 "인증이 필요함" Yes로 설정
+        1. 자동 로그인 설정: 관리자/설정/인증 페이지에서 "자동로그인" 365일로 설정
+
+      1. `파일`탭
+        1. 첨부파일 최대크기변경: 관리자/설정/파일 페이지에서 "최대첨부파일크기" 102400로 설정
 ***
 
 # 백업
@@ -138,9 +176,11 @@ rsync -r /home/gocp/redmine/test1-redmine/files /home/gocp/redmine/test1-redmine
 cp -r /home/gocp/redmine/test1-redmine/mybackup/files/* /home/gocp/redmine/test1-redmine/files
 ```
 ***
+
 # Slack Notifications Plugins
     https://www.redmine.org/projects/redmine/wiki/Plugins
     https://github.com/sciyoshi/redmine-slack
+
 ## Installation of Redmine plugin 
 - docker 내에 plugin 폴더경로로 이동하여 설치한다
 ```bash
